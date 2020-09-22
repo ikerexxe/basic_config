@@ -1,0 +1,9 @@
+---
+- name: Enable ssh
+  hosts: localhost
+  become: no
+  tasks:
+    - pause:
+        prompt: "From guest execute: sudo systemctl enable --now sshd"
+    - pause:
+        prompt: "From host copy ssh key: ssh-copy-id ipedrosa@192.168.122.15"
