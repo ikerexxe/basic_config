@@ -19,3 +19,8 @@ packages:
 
 services:
     - rsyslog
+
+host_ip: 192.168.122.1
+username: ipedrosa
+home_path: /home/{{ username }}
+repos_path: "{{ home_path }}/repos"

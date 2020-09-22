@@ -39,3 +39,34 @@
         state: started
         enabled: yes
       loop: "{{ services }}"
+
+- name: Mount repos
+  hosts: debug_vm
+  vars_files:
+    - variables.yml
+
+  tasks:
+    - name: Generate ssh key
+      openssh_keypair:
+        path: ~/.ssh/id_rsa
+        state: present
+
+    - pause:
+        prompt: "From guest copy ssh key: ssh-copy-id ipedrosa@192.168.122.1"
+
+    - name: Edit /etc/fuse.conf
+      lineinfile:
+        path: /etc/fuse.conf
+        regexp: '^# user_allow_other'
+        line: user_allow_other
+
+    - name: Create repos folder
+      file:
+        path: "{{ repos_path }}"
+        owner: ipedrosa
+        group: ipedrosa
+        mode: '775'
+        state: directory
+
+    - name: Mount remote repos folder
+      command: "sshfs -o allow_root -o reconnect {{ username }}@{{ host_ip }}:{{ repos_path }} {{ repos_path }}"
