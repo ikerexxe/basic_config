@@ -23,3 +23,19 @@
         state: latest
       loop:
         - "{{ packages }}"
+
+- name: Configure services
+  hosts: debug_vm
+  become: yes
+  become_method: sudo
+  become_user: root
+  vars_files:
+    - variables.yml
+
+  tasks:
+    - name: Enable services
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop: "{{ services }}"
