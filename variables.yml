@@ -1,0 +1,18 @@
+packages:
+    - sshfs
+    - vim
+    - git
+    - autoconf
+    - automake
+    - gettext
+    - gettext-common-devel
+    - gettext-devel
+    - libtool
+    - make
+    - flex
+    - bison
+    - byacc
+    - audit-libs-devel
+    - bzip2
+    - sed
+    - rsyslog
