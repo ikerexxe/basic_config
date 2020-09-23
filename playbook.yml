@@ -5,8 +5,9 @@
   tasks:
     - pause:
         prompt: "From guest execute: sudo systemctl enable --now sshd"
-    - pause:
-        prompt: "From host copy ssh key: ssh-copy-id ipedrosa@192.168.122.15"
+
+    - name: Copy ssh key to guest
+      command: "ssh-copy-id ipedrosa@192.168.122.15"
 
 - name: Install packages
   hosts: debug_vm
@@ -40,7 +41,7 @@
         enabled: yes
       loop: "{{ services }}"
 
-- name: Mount repos
+- name: Generate ssh key in guest
   hosts: debug_vm
   vars_files:
     - variables.yml
@@ -51,8 +52,32 @@
         path: ~/.ssh/id_rsa
         state: present
 
-    - pause:
-        prompt: "From guest copy ssh key: ssh-copy-id ipedrosa@192.168.122.1"
+    - name: Fetch the keyfile from one server to another
+      fetch: 
+        src: "~/.ssh/id_rsa.pub"
+        dest: "buffer/{{ansible_hostname}}-id_rsa.pub"
+        flat: yes
+
+- name: Add guest ssh key to host
+  hosts: localhost
+  become: no
+  vars_files:
+    - variables.yml
+
+  tasks:
+
+    - name: Copy the key add to authorized_keys using Ansible module
+      authorized_key:
+        user: "{{ username }}"
+        state: present
+        key: "{{ lookup('file','buffer/localhost-id_rsa.pub')}}"
+
+- name: Mount repos
+  hosts: debug_vm
+  vars_files:
+    - variables.yml
+
+  tasks:
 
     - name: Edit /etc/fuse.conf
       lineinfile:
