@@ -25,7 +25,7 @@
       loop:
         - "{{ packages }}"
 
-- name: Configure services
+- name: Configure guest
   hosts: debug_vm
   become: yes
   become_method: sudo
@@ -40,6 +40,12 @@
         state: started
         enabled: yes
       loop: "{{ services }}"
+
+    - name: Edit /etc/fuse.conf
+      lineinfile:
+        path: /etc/fuse.conf
+        regexp: '^# user_allow_other'
+        line: user_allow_other
 
 - name: Generate ssh key in guest
   hosts: debug_vm
@@ -78,12 +84,6 @@
     - variables.yml
 
   tasks:
-
-    - name: Edit /etc/fuse.conf
-      lineinfile:
-        path: /etc/fuse.conf
-        regexp: '^# user_allow_other'
-        line: user_allow_other
 
     - name: Create repos folder
       file:
