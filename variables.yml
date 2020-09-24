@@ -22,5 +22,6 @@ services:
 
 host_ip: 192.168.122.1
 username: ipedrosa
+id: 1000
 home_path: /home/{{ username }}
 repos_path: "{{ home_path }}/repos"

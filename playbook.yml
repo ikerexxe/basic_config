@@ -80,10 +80,21 @@
 
 - name: Mount repos
   hosts: debug_vm
+  become: no
   vars_files:
     - variables.yml
 
   tasks:
+
+    - name: Authenticate host
+      command: "ssh-keyscan {{ host_ip }}"
+      register: output
+
+    - name: Add host to known_hosts
+      lineinfile:
+        path: "{{ home_path }}/.ssh/known_hosts"
+        line: "{{ output['stdout'] }}"
+        create: yes
 
     - name: Create repos folder
       file:
@@ -93,5 +104,11 @@
         mode: '775'
         state: directory
 
-    - name: Mount remote repos folder
-      command: "sshfs -o allow_root -o reconnect {{ username }}@{{ host_ip }}:{{ repos_path }} {{ repos_path }}"
+    - name: Add repos to /etc/fstab
+      lineinfile:
+        path: /etc/fstab
+        #Source: https://superuser.com/questions/669287/automount-sshfs-using-fstab-without-mount-a
+        line: "{{ username }}@{{ host_ip }}:{{ repos_path }}  {{ repos_path }}  fuse.sshfs x-systemd.automount,_netdev,user,idmap=user,transform_symlinks,identityfile={{ home_path }}/.ssh/id_rsa,allow_other,default_permissions,uid={{ id }},gid={{ id }} 0 0"
+      become: yes
+      become_method: sudo
+      become_user: root
