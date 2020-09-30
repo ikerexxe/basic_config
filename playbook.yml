@@ -47,6 +47,17 @@
         regexp: '^# user_allow_other'
         line: user_allow_other
 
+    - name: Set timezone to Madrid
+      timezone:
+        name: Europe/Madrid
+      notify: Restart crond
+
+  handlers:
+    - name: Restart crond
+      service:
+        name: crond
+        state: restarted
+
 - name: Generate ssh key in guest
   hosts: debug_vm
   vars_files:
