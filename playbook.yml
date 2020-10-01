@@ -2,9 +2,25 @@
 - name: Enable ssh
   hosts: localhost
   become: no
+  vars_files:
+    - variables.yml
+
   tasks:
     - pause:
         prompt: "From guest execute: sudo systemctl enable --now sshd"
+
+    - name: Remove guest from known_hosts
+      known_hosts:
+        path: "{{ known_hosts_file }}"
+        name: "{{ debug_vm_ip }}"
+        state: absent
+
+    - name: Add guest to known_hosts
+      known_hosts:
+        path: "{{ known_hosts_file }}"
+        name: "{{ debug_vm_ip }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan {{ debug_vm_ip }},`dig +short {{ debug_vm_ip }}`') }}"
+        state: present
 
     - name: Copy ssh key to guest
       command: "ssh-copy-id ipedrosa@192.168.122.15"
