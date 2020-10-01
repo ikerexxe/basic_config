@@ -20,10 +20,8 @@
   tasks:
     - name: Install packages
       dnf:
-        name: "{{ item }}"
+        name: "{{ packages }}"
         state: latest
-      loop:
-        - "{{ packages }}"
 
 - name: Configure guest
   hosts: debug_vm
