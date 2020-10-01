@@ -22,7 +22,7 @@
         key: "{{ lookup('pipe', 'ssh-keyscan {{ debug_vm_ip }},`dig +short {{ debug_vm_ip }}`') }}"
         state: present
 
-    - name: Copy ssh key to guest
+    - name: "Copy {{ username }} public key to guest"
       command: "ssh-copy-id ipedrosa@192.168.122.15"
 
 - name: Install packages
@@ -78,12 +78,12 @@
     - variables.yml
 
   tasks:
-    - name: Generate ssh key
+    - name: "Generate {{ username }} keys in guest"
       openssh_keypair:
         path: ~/.ssh/id_rsa
         state: present
 
-    - name: Fetch the keyfile from one server to another
+    - name: "Send {{ username }} public key from guest to host"
       fetch: 
         src: "~/.ssh/id_rsa.pub"
         dest: "buffer/{{ansible_hostname}}-id_rsa.pub"
@@ -97,7 +97,7 @@
 
   tasks:
 
-    - name: Copy the key add to authorized_keys using Ansible module
+    - name: "Add {{ username }} guest public key in host"
       authorized_key:
         user: "{{ username }}"
         state: present
