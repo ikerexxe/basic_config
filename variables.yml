@@ -16,6 +16,9 @@ packages:
     - bzip2
     - sed
     - rsyslog
+    - rpm-build
+    - dnf-plugins-core
+    - libldb-devel
 
 services:
     - rsyslog
